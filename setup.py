@@ -63,16 +63,33 @@ setup(
     ],
     license='GPL2+',
 
-    packages=find_packages("src", exclude=['ez_setup']),
+    packages=find_packages("src"),
+    package_dir={'': 'src'},
+
     namespace_packages=[
         'edeposit',
         'edeposit.amqp'
     ],
+    include_package_data=True,
 
     zip_safe=False,
     install_requires=[
         'setuptools'
     ],
+
+    extras_require={
+        "test": [
+            "unittest2",
+            "robotsuite",
+            "mock",
+            "robotframework-httplibrary"
+        ],
+        "docs": [
+            "sphinxcontrib-robotdoc",
+            "sphinxcontrib-napoleon",
+            "sphinx",
+        ]
+    },
 
     # cmdclass={'sdist': BuildSphinx}
 )
