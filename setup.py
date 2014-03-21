@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 from distutils.command.sdist import sdist
 
 
-version = '1.3.0'
+version = '0.1.0'
 long_description = "\n\n".join([
     open('README.rst').read(),
     open('CONTRIBUTORS.rst').read(),
@@ -24,7 +24,7 @@ class BuildSphinx(sdist):
     def run(self):
         d = os.path.abspath('.')
         DOCS = d + "/" + "docs"
-        DOCS_IN = DOCS + "/_build/html"
+        DOCS_IN = DOCS + "/build/html"
         DOCS_OUT = d + "/html_docs"
 
         if not self.dry_run:
@@ -47,12 +47,11 @@ class BuildSphinx(sdist):
 
 
 setup(
-    name='edeposit.amqp.aleph',
+    name='edeposit.amqp.serializers',
     version=version,
-    description="E-Deposit AMQP module providing communication with Aleph",
+    description="E-Deposit's AMQP definitions and common classes/patterns.",
     long_description=long_description,
-
-    url='https://github.com/edeposit/edeposit.amqp.aleph',
+    url='https://github.com/edeposit/edeposit.amqp.serializers/',
 
     author='Edeposit team',
     author_email='edeposit@email.cz',
@@ -64,33 +63,16 @@ setup(
     ],
     license='GPL2+',
 
-    packages=find_packages('src'),
-    package_dir={'': 'src'},
-
+    packages=find_packages("src", exclude=['ez_setup']),
     namespace_packages=[
         'edeposit',
         'edeposit.amqp'
     ],
-    include_package_data=True,
 
     zip_safe=False,
     install_requires=[
-        'setuptools',
-        "pyDHTMLParser>=1.7.4,<2.0.0",
-        "httpkie>=1.1.0,<2.0.0",
+        'setuptools'
     ],
-    extras_require={
-        "test": [
-            "unittest2",
-            "robotsuite",
-            "mock",
-            "robotframework-httplibrary"
-        ],
-        "docs": [
-            "sphinxcontrib-robotdoc",
-            "sphinxcontrib-napoleon",
-            "sphinx",
-        ]
-    },
-    cmdclass={'sdist': BuildSphinx}
+
+    # cmdclass={'sdist': BuildSphinx}
 )
