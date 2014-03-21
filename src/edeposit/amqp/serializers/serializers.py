@@ -8,6 +8,33 @@ It can also serialize any namedtuple to JSON.
 """
 #= Imports ====================================================================
 import json
+from collections import namedtuple  # has to be imported for deserialization
+
+
+#= Functions & objects ========================================================
+def init_globals(given_globals):
+    """
+    Initialize global variables, so the module will be able to guess names of
+    classes authomatically.
+
+    Args:
+        given_globals (dict): data returned from ``globals()`` call in your
+                              module
+
+    Warning:
+        This function has to be called before you can use (de)serialization
+        functions!
+
+    Example:
+        import serializers
+        serializers.init_globals(globals())
+        serializers.serialize(som_crazy_data)
+    """
+    local_globals = globals()
+
+    for key in given_globals:
+        if key not in local_globals:
+            local_globals[key] = given_globals[key]
 
 
 def _serializeNT(data):
@@ -44,21 +71,22 @@ def _serializeNT(data):
     return data
 
 
-def toJSON(structure):
+def serialize(python_data):
     """
-    Convert structure to json.
+    Serialize class hierarchy into JSON.
 
-    This is necessary, because standard JSON module can't serialize
-    namedtuples.
+    Note:
+        This is necessary, because standard JSON module can't serialize
+        namedtuples.
 
     Args:
-        structure (namedtuple/basic python types): data which will be
-                  serialized to JSON.
+        data (any): any python type serializable to JSON, with added support of
+                    namedtuples
 
     Returns:
-        str: with serialized data.
+        unicode: JSON string
     """
-    return json.dumps(_serializeNT(structure))
+    return json.dumps(_serializeNT(python_data))
 
 
 def _deserializeNT(data):
@@ -93,53 +121,18 @@ def _deserializeNT(data):
     return data
 
 
-def fromJSON(json_data):
+def deserialize(json_str):
     """
-    Convert JSON string back to python structures.
+    Deserialize classes from JSON back to python data.
 
-    This is necessary, because standard JSON module can't serialize
-    namedtuples.
+    Note:
+        This is necessary, because standard JSON module can't serialize
+        namedtuples.
 
     Args:
-        json_data (str): JSON string.
+        json_str (str): JSON encoded string.
 
     Returns:
-        python data/nameduple: with deserialized data.
+        any: any python type (make sure you have namedtuples imported)
     """
-    return _deserializeNT(json.loads(json_data))
-
-def serialize(data):
-    """
-    Serialize class hierarchy into JSON.
-
-    Args:
-        data (any): any python type serializable to JSON, with added support of
-                    namedtuples
-
-    Returns:
-        unicode: JSON string
-    """
-    return toJSON(data)
-
-
-def deserialize(data):
-    """
-    Deserialize classes from JSON data.
-
-    Args:
-        data (str): python data serialized to JSON
-
-    Returns:
-        any: any python typ (make sure you have namedtuples imported)
-    """
-    return fromJSON(data)
-
-def test_JSON_convertor(self):
-    data = ""
-    with open(EXAMPLE_PATH) as f:
-        data = f.read()
-
-    epub = aleph.convertors.toEPublication(data)
-    epub2 = aleph.convertors.fromJSON(aleph.convertors.toJSON(epub))
-
-    assert(epub == epub2)
+    return _deserializeNT(json.loads(json_str))
