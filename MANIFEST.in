@@ -1,0 +1,3 @@
+include CONTRIBUTORS.rst CHANGES.rst README.rst LICENCE
+recursive-include src/edeposit/amqp/serializers/tests *
+recursive-include html_docs *
