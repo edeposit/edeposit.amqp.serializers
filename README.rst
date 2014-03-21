@@ -36,13 +36,13 @@ You can run them manually (from the root of the package):
 
 ::
 
-    $ pybot -W 100 --pythonpath src/edeposit/amqp/serializers/tests/:src src/edeposit/amqp/serializers/tests/
+    $ pybot -W 80 --pythonpath src/edeposit/amqp/serializers/tests/:src src/edeposit/amqp/serializers/tests/
 
 Or continuously using nosier:
 
 ::
 
-    $ nosier -p src -b 'export' "pybot -W 100 --pythonpath src/edeposit/amqp/serializers/tests/ --pythonpath src src/edeposit/amqp/serializers/tests/"
+    $ nosier -p src -b 'export' "pybot -W 80 --pythonpath src/edeposit/amqp/serializers/tests/ --pythonpath src src/edeposit/amqp/serializers/tests/"
 
 Status of acceptance tests
 ++++++++++++++++++++++++++
