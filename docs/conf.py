@@ -36,7 +36,6 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    "sphinxcontrib_robotdoc",
     'sphinxcontrib.napoleon'
 ]
 
