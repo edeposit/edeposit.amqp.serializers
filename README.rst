@@ -4,7 +4,7 @@ Introduction
 This package provides functions to (de)serialize namedtuple to JSON.
 
 
-`Full module documentation <http://edepositamqpserializers.readthedocs.org/en/latest/py-modindex.html>`_ will be hosted at the `readthedocs <http://edepositamqpserializers.readthedocs.org/>`_.
+`Full module documentation <http://edepositamqpserializers.readthedocs.org/en/latest/py-modindex.html>`_ is hosted at the `readthedocs <http://edepositamqpserializers.readthedocs.org/>`_.
 
 
 Installation
