@@ -4,7 +4,35 @@
 # Interpreter version: python 2.7
 #
 """
-It can also serialize any namedtuple to JSON.
+This module is just wrapper over python's `JSON module <http://docs.python.org/2/library/json.html>`_.
+It allows you to serialize ``namedtuple`` and other default python data in very comfortable way - if you
+initialize it properly, it just works and you don't have to take care about anything.
+
+Note:
+    This module exists only because standard JSON module can't serialize
+    ``namedtuple``. If you don't need to serialize ``namedtuple``, you don't need
+    this module.
+
+Serialization details
+---------------------
+``namedtuple`` is serialized to ``dict`` with special property ``__nt_name``,
+where the name of the `class` is stored.
+
+Live example::
+
+    >>> from collections import namedtuple
+    >>> from edeposit.amqp.serializers import serialize, init_globals
+    >>> init_globals(globals())
+    >>> 
+    >>> Person = namedtuple("Person", ["name", "surname"])
+    >>> p = Person("Lishaak", "Bystroushaak")
+    >>> p
+    Person(name='Lishaak', surname='Bystroushaak')
+    >>> serialize(p)
+    '{"surname": "Bystroushaak", "name": "Lishaak", "__nt_name": "Person"}'
+
+API
+---
 """
 #= Imports ====================================================================
 import json
@@ -15,7 +43,7 @@ from collections import namedtuple  # has to be imported for deserialization
 def init_globals(given_globals):
     """
     Initialize global variables, so the module will be able to guess names of
-    classes authomatically.
+    classes automatically.
 
     Args:
         given_globals (dict): data returned from ``globals()`` call in your
@@ -25,10 +53,11 @@ def init_globals(given_globals):
         This function has to be called before you can use (de)serialization
         functions!
 
-    Example:
+    Example of initialization::
+
         import serializers
         serializers.init_globals(globals())
-        serializers.serialize(som_crazy_data)
+        serializers.serialize(some_crazy_data)
     """
     local_globals = globals()
 
@@ -75,10 +104,6 @@ def serialize(python_data):
     """
     Serialize class hierarchy into JSON.
 
-    Note:
-        This is necessary, because standard JSON module can't serialize
-        namedtuples.
-
     Args:
         data (any): any python type serializable to JSON, with added support of
                     namedtuples
@@ -124,10 +149,6 @@ def _deserializeNT(data):
 def deserialize(json_str):
     """
     Deserialize classes from JSON back to python data.
-
-    Note:
-        This is necessary, because standard JSON module can't serialize
-        namedtuples.
 
     Args:
         json_str (str): JSON encoded string.
