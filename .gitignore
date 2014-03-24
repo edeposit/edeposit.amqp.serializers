@@ -4,3 +4,4 @@ output.xml
 report.html
 dist/*
 src/edeposit.amqp.serializers.egg-info/*
+docs/_build
