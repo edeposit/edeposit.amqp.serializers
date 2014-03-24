@@ -85,11 +85,10 @@ setup(
             "robotframework-httplibrary"
         ],
         "docs": [
-            "sphinxcontrib-robotdoc",
             "sphinxcontrib-napoleon",
             "sphinx",
         ]
     },
 
-    # cmdclass={'sdist': BuildSphinx}
+    cmdclass={'sdist': BuildSphinx}
 )
