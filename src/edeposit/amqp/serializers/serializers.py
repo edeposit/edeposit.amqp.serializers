@@ -4,19 +4,21 @@
 # Interpreter version: python 2.7
 #
 """
-This module is just wrapper over python's `JSON module <http://docs.python.org/2/library/json.html>`_.
-It allows you to serialize ``namedtuple`` and other default python data in very comfortable way - if you
-initialize it properly, it just works and you don't have to take care about anything.
+This module is just wrapper over python's
+`JSON module <http://docs.python.org/2/library/json.html>`_. It allows you to
+serialize ``namedtuple`` and other default python data in very comfortable
+way - if you initialize it properly, it just works and you don't have to take
+care about anything.
 
 Note:
     This module exists only because standard JSON module can't serialize
-    ``namedtuple``. If you don't need to serialize ``namedtuple``, you don't need
-    this module.
+    ``namedtuple``. If you don't need to serialize ``namedtuple``, you don't
+    need this module.
 
 Serialization details
 ---------------------
 ``namedtuple`` is serialized to ``dict`` with special property ``__nt_name``,
-where the name of the `class` is stored.
+where the name of the ``namedtuple`` `class` is stored.
 
 Live example::
 
@@ -30,6 +32,32 @@ Live example::
     Person(name='Lishaak', surname='Bystroushaak')
     >>> serialize(p)
     '{"surname": "Bystroushaak", "name": "Lishaak", "__nt_name": "Person"}'
+
+isinstance
+==========
+If you try to serialize module from different hierarchy path, than where it
+will be deserialized, you may run into problems with ``isinstance()``, which
+compares by full path, not just by `class` identity.
+
+Lets take object `p` from previous example::
+
+    >>> p
+    Person(name='Lishaak', surname='Bystroushaak')
+    >>> type(p)
+    <class '__main__.Person'>
+
+As you can see, type of the object is ``<class '__main__.Person'>``. In case
+where the ``namedtuple`` `class` would be defined in module ``Y``, you would
+get something like ``<class 'Y.Person'>`` and you would run into errors, when
+you would try to compare these two for identity.
+
+This is not the issue in normal ``namedtuple`` usage, because you usually
+wouldn´t have two definitions of same `class`. In case of desesrialization, you
+can run into this problems.
+
+Trivial solution is to compare without full paths, just the names of the
+`classes` by using :func:`iiofany`.
+
 
 API
 ---
@@ -157,3 +185,34 @@ def deserialize(json_str):
         any: any python type (make sure you have namedtuples imported)
     """
     return _deserializeNT(json.loads(json_str))
+
+
+def iiOfAny(instance, classes):
+    """
+    Returns true, if `instance` is instance of any (iiOfAny) of the `classes`.
+
+    This function doesn't use isinstance() check, it just compares the
+    `class` names.
+
+    This can be generaly dangerous, but it is really useful when you are
+    comparing class serialized in one module and deserialized in another.
+
+    This causes, that module paths in class internals are different and
+    ``isinstance()`` and ``type()`` comparsions thus fails.
+
+    Use this function instead, if you wan't to check what type is your
+    deserialized message.
+
+    Args:
+        instance (object): class instance you want to know the type
+        classes (list): classes, or just one class you want to compare - func
+                        automatically converts nonlist/nontuple parameters to
+                        list
+
+    Returns:
+        bool: True if `instance` **can be** instance of any of the `classes`.
+    """
+    if type(classes) not in [list, tuple]:
+        classes = [classes]
+
+    return any(map(lambda x: type(instance).__name__ == x.__name__, classes))
