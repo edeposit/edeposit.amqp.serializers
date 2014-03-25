@@ -5,16 +5,17 @@
 #
 
 import imp
-import edeposit.amqp.aleph as aleph
-import edeposit.amqp.aleph.export as export
-import edeposit.amqp.aleph.convertor as convertor
-
 import os.path
+from collections import namedtuple
+
+import edeposit.amqp.serializers as serializers_package
+import edeposit.amqp.serializers.serializers as serializers
 
 
 BASE_PATH = os.path.dirname(__file__)
-EXAMPLE_PATH = BASE_PATH + "/"
-EXAMPLE_PATH += "resources/aleph_data_examples/xml_outputs/example4.xml"
+
+
+TestNT = namedtuple("TestNT", ["first", "second"])
 
 
 class Inspector(object):
@@ -37,29 +38,17 @@ class Inspector(object):
     def call(self, fn, *args, **kwargs):
         return fn(*args, **kwargs)
 
-    def aleph_request(self, request):
-        def blank_fn(result, uuid):
-            return result
-
-        return aleph.reactToAMQPMessage(
-            request,
-            blank_fn,
-            "0"
-        )
-
-    def greater_or_equal_than(self, lvalue, rvalue):
-        if int(lvalue) < int(rvalue):
-            raise AssertionError(str(lvalue) + " is not >= " + str(rvalue))
-
     def length(self, val):
         return len(val)
 
-    def test_JSON_convertor(self):
-        data = ""
-        with open(EXAMPLE_PATH) as f:
-            data = f.read()
+    def has_attribute(self, obj, attr):
+        return hasattr(obj, attr)
 
-        epub = aleph.convertors.toEPublication(data)
-        epub2 = aleph.convertors.fromJSON(aleph.convertors.toJSON(epub))
+    def get_globals(self):
+        return globals()
 
-        assert(epub == epub2)
+    def to_list(self, x):
+        return list(x)
+
+    def compare_nt(self, nt1, nt2):
+        return nt1 == nt2

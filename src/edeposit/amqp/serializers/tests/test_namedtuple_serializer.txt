@@ -1,0 +1,73 @@
+*** Settings ***
+Library     inspector.Inspector
+Library     OperatingSystem
+Variables   inspector.py
+
+
+
+*** Keywords ***
+Má atribut
+    [Documentation]  Ověří, zda je atribut přítomen v objektu - wrapper nad hasattr()
+    [Arguments]      ${objekt}        ${atribut}
+    Log              ${objekt}
+    Log              ${atribut}
+    ${RV} =          Has attribute    ${objekt}      ${atribut}
+    Should be true   ${RV}
+
+Vytvoř testovací namedtuple
+    ${RV} =          Call             ${TestNT}      ${1}         dva
+    [Return]         ${RV}
+
+Serializuj
+    [Arguments]      ${objekt}
+    Log              ${objekt}
+    ${RV} =          Call             ${serializers.serialize}    ${objekt}
+    [Return]         ${RV}
+
+Deserializuj
+    [Arguments]      ${objekt}
+    Log              ${objekt}
+    ${globals} =     Get globals
+    ${RV} =          Call             ${serializers.deserialize}  ${objekt}  ${globals}
+    [Return]         ${RV}
+
+Porovnej
+    [Documentation]  Porovná identičnost pomocí pythonního ==, což může být zavádějící.
+    [Arguments]      ${nt1}           ${nt2}
+    ${RV}            Compare nt       ${TNT}         ${DNT}
+    Should be true   ${RV}
+
+Porovnej jako pole
+    [Documentation]  Porovná argumenty jako pole, což může odhalit problémy ve vnitřnostech.
+    [Arguments]      ${nt1}           ${nt2}
+    ${nt1_list} =    To list          ${nt1}
+    ${nt2_list} =    To list          ${nt2}
+    ${RV}            Compare nt       ${nt1_list}    ${nt2_list}
+    Should be true   ${RV}
+
+
+*** Test Cases ***
+Ověření API
+    [Documentation]  Ověříme, zda API stále odpovídá deklaracím v dokumentaci.
+    Má atribut       ${serializers}   serialize
+    Má atribut       ${serializers}   deserialize
+    Má atribut       ${serializers}   iiOfAny
+
+
+Dostupnost submodulu na urovni package
+    [Documentation]  Funkce z edeposit.amqp.serializers.serializers musí být přítomny i v edeposit.amqp.serializers.
+    Má atribut       ${serializers_package}  serialize
+
+
+Test (de)serializace
+    ${TNT} =         Vytvoř testovací namedtuple
+    Log              ${TNT}
+
+    ${SNT} =         Serializuj       ${TNT}
+    Log              ${SNT}
+
+    ${DNT}           Deserializuj     ${SNT}
+    Log              ${DNT}
+
+    Porovnej                          ${TNT}  ${DNT}
+    Porovnej jako pole                ${TNT}  ${DNT}
