@@ -4,9 +4,6 @@ Introduction
 This package provides functions to (de)serialize namedtuple to JSON.
 
 
-`Full module documentation <http://edepositamqpserializers.readthedocs.org/en/latest/py-modindex.html>`_ is hosted at the `readthedocs <http://edepositamqpserializers.readthedocs.org/>`_.
-
-
 Installation
 ------------
 
@@ -17,6 +14,12 @@ Module is hosted at `PYPI <http://pypi.python.org>`_, and can be easily installe
     pip install edeposit.amqp.serializers
 
 Source codes can be found at `GitHub <https://github.com/>`_: https://github.com/jstavel/edeposit.amqp.serializers.
+
+
+Documentation
+-------------
+
+`Full module documentation <http://edepositamqpserializers.readthedocs.org/>`_ is hosted at the ReadTheDocs.
 
 Content
 -------
