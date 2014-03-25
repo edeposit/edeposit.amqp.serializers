@@ -23,9 +23,8 @@ where the name of the ``namedtuple`` `class` is stored.
 Live example::
 
     >>> from collections import namedtuple
-    >>> from edeposit.amqp.serializers import serialize, init_globals
-    >>> init_globals(globals())
-    >>> 
+    >>> from edeposit.amqp.serializers import serialize
+    >>>
     >>> Person = namedtuple("Person", ["name", "surname"])
     >>> p = Person("Lishaak", "Bystroushaak")
     >>> p
@@ -68,32 +67,6 @@ from collections import namedtuple  # has to be imported for deserialization
 
 
 #= Functions & objects ========================================================
-def init_globals(given_globals):
-    """
-    Initialize global variables, so the module will be able to guess names of
-    classes automatically.
-
-    Args:
-        given_globals (dict): data returned from ``globals()`` call in your
-                              module
-
-    Warning:
-        This function has to be called before you can use (de)serialization
-        functions!
-
-    Example of initialization::
-
-        import serializers
-        serializers.init_globals(globals())
-        serializers.serialize(some_crazy_data)
-    """
-    local_globals = globals()
-
-    for key in given_globals:
-        if key not in local_globals:
-            local_globals[key] = given_globals[key]
-
-
 def _serializeNT(data):
     """
     Serialize namedtuples (and other basic python types) to dictionary with
@@ -142,28 +115,35 @@ def serialize(python_data):
     return json.dumps(_serializeNT(python_data))
 
 
-def _deserializeNT(data):
+def _deserializeNT(data, glob):
     """
     Deserialize special kinds of dicts from _serializeNT().
     """
     if isinstance(data, list):
-        return map(lambda x: _deserializeNT(x), data)
+        return map(lambda x: _deserializeNT(x, glob), data)
 
     elif isinstance(data, tuple):
-        return tuple(map(lambda x: _deserializeNT(x), data))
+        return tuple(map(lambda x: _deserializeNT(x, glob), data))
 
     elif isinstance(data, dict) and "__nt_name" in data:  # is namedtuple
         class_name = data["__nt_name"]
         del data["__nt_name"]
 
+        # given globals
+        if class_name in glob:
+            return glob[class_name](
+                **dict(zip(data, _deserializeNT(data.values(), glob)))
+            )
+
+        # "local" (package) globals
         return globals()[class_name](
-            **dict(zip(data, _deserializeNT(data.values())))
+            **dict(zip(data, _deserializeNT(data.values(), glob)))
         )
 
     elif isinstance(data, dict):
         return dict(
             map(
-                lambda key: [key, _deserializeNT(data[key])],
+                lambda key: [key, _deserializeNT(data[key], glob)],
                 data
             )
         )
@@ -174,17 +154,26 @@ def _deserializeNT(data):
     return data
 
 
-def deserialize(json_str):
+def deserialize(json_str, glob):
     """
     Deserialize classes from JSON back to python data.
 
     Args:
         json_str (str): JSON encoded string.
+        glob (dict):    Output from globals() call - your context of variables.
+
+    Call example::
+        deserialize(data, globals())
+
+    Warning:
+        Call the globals() every time, you call this function, because your
+        variable context could change. Also don't pass a blank dict - it may
+        work sometimes, but fail unpredictably later.
 
     Returns:
         any: any python type (make sure you have namedtuples imported)
     """
-    return _deserializeNT(json.loads(json_str))
+    return _deserializeNT(json.loads(json_str), glob)
 
 
 def iiOfAny(instance, classes):
