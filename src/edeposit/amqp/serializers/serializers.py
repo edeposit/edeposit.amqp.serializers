@@ -6,19 +6,20 @@
 """
 This module is just wrapper over python's
 `JSON module <http://docs.python.org/2/library/json.html>`_. It allows you to
-serialize ``namedtuple`` and other default python data in very comfortable
-way - if you initialize it properly, it just works and you don't have to take
-care about anything.
+serialize :py:func:`collections.namedtuple` and other default python data in
+very comfortable way - if you initialize it properly, it just works and you
+don't have to take care about anything.
 
 Note:
     This module exists only because standard JSON module can't serialize
-    ``namedtuple``. If you don't need to serialize ``namedtuple``, you don't
-    need this module.
+    :py:func:`collections.namedtuple`. If you don't need to serialize 
+    :py:func:`collections.namedtuple`, you don't need this module.
 
 Serialization details
 ---------------------
-``namedtuple`` is serialized to ``dict`` with special property ``__nt_name``,
-where the name of the ``namedtuple`` `class` is stored.
+:py:func:`collections.namedtuple` is serialized to :py:class:`dict` with special
+property ``__nt_name``, where the name of the :py:func:`collections.namedtuple`
+`class` is stored.
 
 Live example::
 
@@ -35,8 +36,8 @@ Live example::
 isinstance
 ==========
 If you try to serialize module from different hierarchy path, than where it
-will be deserialized, you may run into problems with ``isinstance()``, which
-compares by full path, not just by `class` identity.
+will be deserialized, you may run into problems with :py:func:`isinstance`,
+which compares by full path, not just by `class` identity.
 
 Lets take object `p` from previous example::
 
@@ -46,16 +47,16 @@ Lets take object `p` from previous example::
     <class '__main__.Person'>
 
 As you can see, type of the object is ``<class '__main__.Person'>``. In case
-where the ``namedtuple`` `class` would be defined in module ``Y``, you would
-get something like ``<class 'Y.Person'>`` and you would run into errors, when
-you would try to compare these two for identity.
+where the :py:func:`collections.namedtuple` `class` would be defined in module
+``Y``, you would get something like ``<class 'Y.Person'>`` and you would run
+into errors, when you would try to compare these two for identity.
 
-This is not the issue in normal ``namedtuple`` usage, because you usually
-wouldn´t have two definitions of same `class`. In case of desesrialization, you
-can run into this problems.
+This is not the issue in normal :py:func:`collections.namedtuple` usage, because
+you usually wouldn´t have two definitions of same `class`. In case of
+desesrialization, you can run into this problems.
 
 Trivial solution is to compare without full paths, just the names of the
-`classes` by using :func:`iiofany`.
+`classes` by using :func:`iiOfAny`.
 
 
 API
@@ -106,11 +107,11 @@ def serialize(python_data):
     Serialize class hierarchy into JSON.
 
     Args:
-        data (any): any python type serializable to JSON, with added support of
-                    namedtuples
+        data (any): any python type serializable to :py:mod:`json`, with added
+                    support of :py:func:`collections.namedtuple`
 
     Returns:
-        unicode: JSON string
+        unicode: :py:mod:`json` string
     """
     return json.dumps(_serializeNT(python_data))
 
@@ -159,16 +160,18 @@ def deserialize(json_str, glob):
     Deserialize classes from JSON back to python data.
 
     Args:
-        json_str (str): JSON encoded string.
-        glob (dict):    Output from globals() call - your context of variables.
+        json_str (str): :py:mod:`json` encoded string.
+        glob (dict):    Output from :py:func:`globals` call - your context of
+                        variables.
 
     Call example::
+
         deserialize(data, globals())
 
     Warning:
-        Call the globals() every time, you call this function, because your
-        variable context could change. Also don't pass a blank dict - it may
-        work sometimes, but fail unpredictably later.
+        Call the :py:func:`globals` every time, you call this function, because
+        your variable context could change. Also don't pass a blank dict - it
+        may work sometimes, but fail unpredictably later.
 
     Returns:
         any: any python type (make sure you have namedtuples imported)
@@ -180,14 +183,14 @@ def iiOfAny(instance, classes):
     """
     Returns true, if `instance` is instance of any (iiOfAny) of the `classes`.
 
-    This function doesn't use isinstance() check, it just compares the
+    This function doesn't use :py:func:`isinstance` check, it just compares the
     `class` names.
 
     This can be generaly dangerous, but it is really useful when you are
     comparing class serialized in one module and deserialized in another.
 
     This causes, that module paths in class internals are different and
-    ``isinstance()`` and ``type()`` comparsions thus fails.
+    :py:func:`isinstance` and :py:func:`type` comparsions thus fails.
 
     Use this function instead, if you wan't to check what type is your
     deserialized message.
