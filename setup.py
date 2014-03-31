@@ -7,12 +7,14 @@ import shutil
 from setuptools import setup, find_packages
 from distutils.command.sdist import sdist
 
+from docs import getVersion
 
-version = '1.1.0'
+
+changelog = open('CHANGES.rst').read()
 long_description = "\n\n".join([
     open('README.rst').read(),
     open('CONTRIBUTORS.rst').read(),
-    open('CHANGES.rst').read()
+    changelog
 ])
 
 
@@ -48,7 +50,7 @@ class BuildSphinx(sdist):
 
 setup(
     name='edeposit.amqp.serializers',
-    version=version,
+    version=getVersion(changelog),
     description="E-Deposit's AMQP definitions and common classes/patterns.",
     long_description=long_description,
     url='https://github.com/edeposit/edeposit.amqp.serializers/',

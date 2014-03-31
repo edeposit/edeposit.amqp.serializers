@@ -1,10 +1,14 @@
 Changelog
 =========
 
+1.1.1
+-----
+    - Version of package and documentation is now automatically parsed from this file.
+    - Fixed few bugs in documentation.
+
 1.1.0
 -----
     - Removed init_globals(). Globals are now passed as parameter to deserialize(). This was necessary to cover changes in variables during runtime.
-
 
 1.0.0
 -----
