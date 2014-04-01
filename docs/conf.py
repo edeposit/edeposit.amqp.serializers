@@ -2,6 +2,7 @@
 #
 import os
 import sys
+import urllib
 import os.path
 
 sys.path.insert(0, os.path.normpath(os.path.abspath('.') + '/../src'))
@@ -47,8 +48,16 @@ project = u'edeposit.amqp.serializers'
 copyright = u'2014 E-deposit team'
 
 # The full version, including alpha/beta/rc tags.
-from __init__ import getVersion
-release = getVersion(open("../CHANGES.rst").read())
+try:
+    # read data from CHANGES.rst
+    from __init__ import getVersion
+    release = getVersion(open("../CHANGES.rst").read())
+except:
+    # this is here specially for readthedocs, which downloads only docs, not
+    # other files
+    fh = urllib.urlopen("https://pypi.python.org/pypi/" + project + "/")
+    release = filter(lambda x: "<title>" in x, fh.read().splitlines())
+    release = release[0].split(":")[0].split()[1]
 
 # The short X.Y version.
 version = ".".join(release.split(".")[:2])
