@@ -62,12 +62,12 @@ Trivial solution is to compare without full paths, just the names of the
 API
 ---
 """
-#= Imports ====================================================================
+# Imports =====================================================================
 import json
 from collections import namedtuple  # has to be imported for deserialization
 
 
-#= Functions & objects ========================================================
+# Functions & objects =========================================================
 def _serializeNT(data):
     """
     Serialize namedtuples (and other basic python types) to dictionary with
@@ -80,7 +80,7 @@ def _serializeNT(data):
     Data can be later automatically de-serialized by calling _deserializeNT().
     """
     if isinstance(data, list):
-        return map(lambda x: _serializeNT(x), data)
+        return [_serializeNT(item) for item in data]
 
     elif isinstance(data, tuple) and hasattr(data, "_fields"):  # is namedtuple
         serialized = _serializeNT(dict(data._asdict()))
@@ -89,15 +89,13 @@ def _serializeNT(data):
         return serialized
 
     elif isinstance(data, tuple):
-        return tuple(map(lambda x: _serializeNT(x), data))
+        return tuple(_serializeNT(item) for item in data)
 
     elif isinstance(data, dict):
-        return dict(
-            map(
-                lambda key: [key, _serializeNT(data[key])],
-                data
-            )
-        )
+        return {
+            key: _serializeNT(data[key])
+            for key in data
+        }
 
     return data
 
@@ -121,10 +119,10 @@ def _deserializeNT(data, glob):
     Deserialize special kinds of dicts from _serializeNT().
     """
     if isinstance(data, list):
-        return map(lambda x: _deserializeNT(x, glob), data)
+        return [_deserializeNT(item, glob) for item in data]
 
     elif isinstance(data, tuple):
-        return tuple(map(lambda x: _deserializeNT(x, glob), data))
+        return tuple(_deserializeNT(item, glob) for item in data)
 
     elif isinstance(data, dict) and "__nt_name" in data:  # is namedtuple
         class_name = data["__nt_name"]
@@ -142,12 +140,10 @@ def _deserializeNT(data, glob):
         )
 
     elif isinstance(data, dict):
-        return dict(
-            map(
-                lambda key: [key, _deserializeNT(data[key], glob)],
-                data
-            )
-        )
+        return {
+            key: _deserializeNT(data[key], glob)
+            for key in data
+        }
 
     elif isinstance(data, unicode):
         return data.encode("utf-8")
@@ -207,4 +203,7 @@ def iiOfAny(instance, classes):
     if type(classes) not in [list, tuple]:
         classes = [classes]
 
-    return any(map(lambda x: type(instance).__name__ == x.__name__, classes))
+    return any(
+        type(instance).__name__ == cls.__name__
+        for cls in classes
+    )
