@@ -2,6 +2,7 @@ Changelog
 =========
 
 1.2.0
+-----
     - Some parts rewritten to generators / list comprehensions.
     - Added run_tests.sh.
     - README.txt minimized.
